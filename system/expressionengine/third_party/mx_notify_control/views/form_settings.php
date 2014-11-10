@@ -263,6 +263,7 @@ $out = '
 	<option value="9"  '.((isset($settings['trigger_'.$row_id])) ? (($settings['trigger_'.$row_id] == '9') ? " selected='selected'" : "" ) : "").'>Member Login</option>
 	<option value="10"  '.((isset($settings['trigger_'.$row_id])) ? (($settings['trigger_'.$row_id] == '10') ? " selected='selected'" : "" ) : "").'>Member CP Login</option>
 	<option value="11"  '.((isset($settings['trigger_'.$row_id])) ? (($settings['trigger_'.$row_id] == '11') ? " selected='selected'" : "" ) : "").'>Member Group Update</option>
+   <option value="12" '.((isset($settings['trigger_'.$row_id])) ? (($settings['trigger_'.$row_id] == '12') ? " selected='selected'" : "" ) : "").'>New Comment</option>
 </select>
 
 
