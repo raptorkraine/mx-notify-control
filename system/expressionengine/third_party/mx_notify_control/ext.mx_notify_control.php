@@ -316,13 +316,52 @@ class Mx_notify_control_ext {
          }
 
          if ($site_settings["trigger_" . $iRow] == '6' and ( $this->EE->input->get_post('entry_id') != 0) and ( isset($site_settings['channel_' . $iRow][$meta['channel_id']])) and ( isset($site_settings['channel_' . $iRow][$meta['channel_id'] . '_' . $meta['status']]))) {
-
-
             if ($site_settings["type_" . $iRow] == 'email') {
-
-
                $edata['author_email'] = $this->member_email($meta['author_id']);
                $this->first_email_send($edata, $meta['author_id'], $iRow, $entry_id, ((isset($site_settings['mbr_groups_' . $iRow])) ? $site_settings['mbr_groups_' . $iRow] : false), ((isset($site_settings['tocustomlist_' . $iRow])) ? (($site_settings['tocustomlist_' . $iRow] != "") ? $site_settings['tocustomlist_' . $iRow] : false) : false));
+            }
+         }
+      }
+
+      return TRUE;
+   }
+
+   /**
+    * insert_comment_end function.
+    *
+    * @access public
+    * @param mixed $edata
+    * @param mixed $comment_moderate
+    * @param mixed $comment_id
+    * @return void
+    */
+   function insert_comment_end($edata, $comment_moderate, $comment_id) {
+      if (isset($this->settings[SITE_ID])) {
+         $site_settings = $this->settings[SITE_ID];
+      } else {
+         return false;
+      }
+
+      $entry_id = $edata['revision_post']['entry_id'] = $edata['entry_id'];
+
+      $this->EE->db->where('entry_id', $entry_id);
+      $query = $this->EE->db->get('channel_data');
+
+      foreach ($query->result() as $row) {
+         foreach ($row as $field => $value) {
+            if (substr($field, 0, 5) == 'field') {
+               $edata[$field] = $value;
+            }
+         }
+      }
+
+      foreach ($site_settings['row_order'] as $key => $value) {
+         $iRow = $value;
+         $group_id = false;
+
+         if ($site_settings["trigger_" . $iRow] == '12' and ( $this->EE->input->get_post('entry_id') != 0)) {
+            if ($site_settings["type_" . $iRow] == 'email') {
+               $this->first_email_send($edata, $edata['author_id'], $iRow, $edata['entry_id'], ((isset($site_settings['mbr_groups_' . $iRow])) ? $site_settings['mbr_groups_' . $iRow] : false), ((isset($site_settings['tocustomlist_' . $iRow])) ? (($site_settings['tocustomlist_' . $iRow] != "") ? $site_settings['tocustomlist_' . $iRow] : false) : false));
             }
          }
       }
@@ -623,42 +662,6 @@ class Mx_notify_control_ext {
       return TRUE;
    }
 
-    /**
-    * insert_comment_end function.
-    *
-    * @access public
-    * @param mixed $edata
-    * @param mixed $comment_moderate
-    * @param mixed $comment_id
-    * @return void
-    */
-   function insert_comment_end($edata, $comment_moderate, $comment_id) {
-      if (isset($this->settings[SITE_ID])) {
-         $site_settings = $this->settings[SITE_ID];
-      } else {
-         return false;
-      }
-      
-      $entry_id = $edata['entry_id'];
-
-      foreach ($site_settings['row_order'] as $key => $value) {
-         $iRow = $value;
-         $group_id = false;
-
-         if ($site_settings["trigger_" . $iRow] == '12') {
-
-            if ($site_settings["type_" . $iRow] == 'email') {
-               $edata['author_email'] = $this->member_email($edata['author_id']);
-               $this->first_email_send($edata, $edata['author_id'], $iRow, $entry_id, ((isset($site_settings['mbr_groups_' . $iRow])) ? $site_settings['mbr_groups_' . $iRow] : false), ((isset($site_settings['tocustomlist_' . $iRow])) ? (($site_settings['tocustomlist_' . $iRow] != "") ? $site_settings['tocustomlist_' . $iRow] : false) : false));
-            }
-            
-         }
-
-      }
-
-      return TRUE;
-   }
-
    // --------------------------------
    //  Send PM
    // --------------------------------
@@ -815,7 +818,7 @@ class Mx_notify_control_ext {
             }
 
             if ($type = 'vmg_chosen_member') {
-               if ($data['revision_post']['field_id_' . $f_id] != '') {
+               //if ($data['revision_post']['field_id_' . $f_id] != '') {
                   $member_ids = explode('|', $data['field_id_' . $f_id]);
                   $this->EE->load->model('member_model');
 
@@ -827,7 +830,7 @@ class Mx_notify_control_ext {
                          'mbr_member_id' => $member['member_id']
                      );
                   }
-               }
+               //}
             }
          }
       }
@@ -857,7 +860,6 @@ class Mx_notify_control_ext {
             }
          }
       }
-      ;
 
       if ($mbr_c_groups) {
          $mbr_c_groups = trim($this->EE->TMPL->parse_variables_row($mbr_c_groups, $msg_data));
